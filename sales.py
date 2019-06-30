@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 import time
 import json
 from html.parser import HTMLParser
+import os
 
 #initialize driver
 
@@ -32,7 +33,15 @@ searchbox = driver.find_element_by_xpath(searchbox_xpath)
 
 # INTERACT WITH THE ELEMENT
 
-search_term = "AMERICAN HEALTH CARE SOFTWARE ENTERPRISES INC owner name linkedin owner"
+companies = [
+    {"id":1, "name": "AMERICAN HEALTH CARE SOFTWARE ENTERPRISES INC"},
+    {"id":2, "name": "AMBULATORY CARE OF WARTBURG"}
+]
+
+for p in companies:
+    search_term = (p["name"])
+
+#search_term = companies["id"]
 searchbox.send_keys(search_term)
 
 searchbox.send_keys(Keys.RETURN)
@@ -44,10 +53,22 @@ soup = BeautifulSoup(driver.page_source, features = "lxml")
 companylinks = soup.find_all("div", "r")
 #companylinks = soup.find_all("span", "company-trade-style") # class name and what class equals
 
+title = soup.title
 
-title2 = soup.h3
-print(title2)
+results = soup.h3
+print(results)
 
+csv_file_path = os.path.join(os.path.dirname(__file__), "data", "contacts.csv")
+
+csv_headers = ["company name", "results"]
+
+with open(csv_file_path, "w") as csv_file:
+    writer = csv.DictWriter(csv_file, fieldnames=csv_headers)
+    writer.writeheader() # uses fieldnames set above
+    writer.writerow({
+        "company name": title,
+        "results": results, 
+        })
 
 #linkedin = companylinks["a href"]
 #print(linkedin)
