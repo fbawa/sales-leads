@@ -14,63 +14,42 @@ CHROMEDRIVER_PATH = "c:\Repo\chromedriver\chromedriver"
 
 driver = webdriver.Chrome(CHROMEDRIVER_PATH)
 
-# NAVIGATE TO GOOGLE.COM...
+csv_file_path = os.path.join(os.path.dirname(__file__), "data", "source.csv") # a relative filepath
 
-driver.get("https://www.google.com/")
-#driver.get("https://www.buzzfile.com/Home/Basic") #https://www.buzzfile.com/Home/Basic
-print(driver.title) #> Google
-driver.save_screenshot("search_page.png")
+with open(csv_file_path, "r") as source: # "r" means "open the file for reading"
+    reader = csv.reader(source) # if your CSV doesn't have headers
+    companies = list(reader)
 
-# FIND AN ELEMENT TO INTERACT WITH...
-# a reference to the HTML element:
-# <input title="Search">
+#companies = ["AMERICAN HEALTH CARE SOFTWARE ENTERPRISES INC", "AMBULATORY CARE OF WARTBURG"]
 
-searchbox_xpath = '//input[@title="Search"]'
-#searchbox_xpath = '//input[@value=""]'
-#searchbox_xpath = '//input[@placeholder="SearchbyCompanyName"]'
-#searchbox = driver.find_element_by_name('searchTerm')
-searchbox = driver.find_element_by_xpath(searchbox_xpath)
-
-# INTERACT WITH THE ELEMENT
-
-companies = [
-    {"id":1, "name": "AMERICAN HEALTH CARE SOFTWARE ENTERPRISES INC"},
-    {"id":2, "name": "AMBULATORY CARE OF WARTBURG"}
-]
-
-for p in companies:
-    search_term = (p["name"])
-
-#search_term = companies["id"]
-searchbox.send_keys(search_term)
-
-searchbox.send_keys(Keys.RETURN)
-#print(driver.title) #> 'Prof Rossetti GitHub - Google Search'
-driver.save_screenshot("search_results.png")
-
-soup = BeautifulSoup(driver.page_source, features = "lxml")
-#soup = BeautifulSoup(driver.page_source, 'html.parser')
-companylinks = soup.find_all("div", "r")
-#companylinks = soup.find_all("span", "company-trade-style") # class name and what class equals
-
-title = soup.title
-
-results = soup.h3
-print(results)
+print(companies)
 
 csv_file_path = os.path.join(os.path.dirname(__file__), "data", "contacts.csv")
-
 csv_headers = ["company name", "results"]
+    
 
-with open(csv_file_path, "w") as csv_file:
-    writer = csv.DictWriter(csv_file, fieldnames=csv_headers)
-    writer.writeheader() # uses fieldnames set above
-    writer.writerow({
-        "company name": title,
-        "results": results, 
-        })
-
-#linkedin = companylinks["a href"]
-#print(linkedin)
+for search_term in companies:
+    #navigate to google
+    driver.get("https://www.google.com/")
+    print(driver.title) #> Google
+    searchbox_xpath = '//input[@title="Search"]'
+    searchbox = driver.find_element_by_xpath(searchbox_xpath)
+    # INTERACT WITH THE ELEMENT
+    print(search_term)
+    searchbox.send_keys(search_term + " owner linkedin owner")
+    searchbox.send_keys(Keys.RETURN)
+    #scrape the results
+    soup = BeautifulSoup(driver.page_source, features = "lxml")
+    title = soup.title
+    results = soup.h3
+    print(results)
+    with open(csv_file_path, "a") as csv_file:
+        writer = csv.DictWriter(csv_file, fieldnames=csv_headers)
+        writer.writeheader() # uses fieldnames set above
+        writer.writerow({
+            "company name": search_term,
+            "results": results, 
+            })
+    
 
 #driver.quit()
