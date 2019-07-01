@@ -24,6 +24,9 @@ companies  = [val for sublist in source_comp for val in sublist] # getting rid o
 
 csv_file_path = os.path.join(os.path.dirname(__file__), "data", "contacts.csv")
 csv_headers = ["company name", "results"]
+with open(csv_file_path, "w") as csv_file:
+    writer = csv.DictWriter(csv_file, fieldnames=csv_headers)
+    writer.writeheader() # uses fieldnames set above
     
 for search_term in companies:
     #navigate to google
@@ -42,7 +45,6 @@ for search_term in companies:
     print(results)
     with open(csv_file_path, "a") as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=csv_headers)
-        writer.writeheader() # uses fieldnames set above
         writer.writerow({
             "company name": search_term,
             "results": results, 
