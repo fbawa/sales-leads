@@ -18,16 +18,13 @@ csv_file_path = os.path.join(os.path.dirname(__file__), "data", "source.csv") # 
 
 with open(csv_file_path, "r") as source: # "r" means "open the file for reading"
     reader = csv.reader(source) # if your CSV doesn't have headers
-    companies = list(reader)
+    source_comp = list(reader) #companies = ["AMERICAN HEALTH CARE SOFTWARE ENTERPRISES INC", "AMBULATORY CARE OF WARTBURG"]
 
-#companies = ["AMERICAN HEALTH CARE SOFTWARE ENTERPRISES INC", "AMBULATORY CARE OF WARTBURG"]
-
-print(companies)
+companies  = [val for sublist in source_comp for val in sublist] # getting rid of the brackets
 
 csv_file_path = os.path.join(os.path.dirname(__file__), "data", "contacts.csv")
 csv_headers = ["company name", "results"]
     
-
 for search_term in companies:
     #navigate to google
     driver.get("https://www.google.com/")
@@ -36,7 +33,7 @@ for search_term in companies:
     searchbox = driver.find_element_by_xpath(searchbox_xpath)
     # INTERACT WITH THE ELEMENT
     print(search_term)
-    searchbox.send_keys(search_term + " owner linkedin owner")
+    searchbox.send_keys(search_term + " ceo founder owner linkedin")
     searchbox.send_keys(Keys.RETURN)
     #scrape the results
     soup = BeautifulSoup(driver.page_source, features = "lxml")
