@@ -23,8 +23,8 @@ with open(csv_file_path, "r") as source: # "r" means "open the file for reading"
 companies  = [val for sublist in source_comp for val in sublist] # getting rid of the brackets
 
 csv_file_path = os.path.join(os.path.dirname(__file__), "data", "contacts.csv")
-csv_headers = ["Company Name", "Results", "Links"]
-with open(csv_file_path, "w") as csv_file:
+csv_headers = ["Company Name", "Name", "Role", "Links"]
+with open(csv_file_path, "w", newline='') as csv_file:
     writer = csv.DictWriter(csv_file, fieldnames=csv_headers)
     writer.writeheader() # uses fieldnames set above
     
@@ -41,13 +41,16 @@ for search_term in companies:
     #scrape the results
     soup = BeautifulSoup(driver.page_source, features = "lxml")
     title = soup.title
-    results = soup.h3.text #drop a breakpoint, get class, and get dir to see what you can invoke
+    longresults = soup.h3.text #drop a breakpoint, get class, and get dir to see what you can invoke
+    name = longresults.split('-', 1)[0] 
+    role = longresults.split('-', 1)[1] 
     link = soup.cite.text
-    with open(csv_file_path, "a") as csv_file:
+    with open(csv_file_path, "a", newline='') as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=csv_headers)
         writer.writerow({
             "Company Name": search_term,
-            "Results": results, 
+            "Name": name, 
+            "Role": role,
             "Links": link,
             })
     
