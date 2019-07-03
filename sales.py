@@ -3,9 +3,6 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import requests
 from bs4 import BeautifulSoup
-import time
-import json
-from html.parser import HTMLParser
 import os
 
 #initialize driver
@@ -35,15 +32,21 @@ for search_term in companies:
     searchbox_xpath = '//input[@title="Search"]'
     searchbox = driver.find_element_by_xpath(searchbox_xpath)
     # INTERACT WITH THE ELEMENT
-    print(search_term)
+    #print(search_term)
     searchbox.send_keys(search_term + " ceo founder owner linkedin")
     searchbox.send_keys(Keys.RETURN)
     #scrape the results
     soup = BeautifulSoup(driver.page_source, features = "lxml")
     title = soup.title
     longresults = soup.h3.text #drop a breakpoint, get class, and get dir to see what you can invoke
-    name = longresults.split('-', 1)[0] 
-    role = longresults.split('-', 1)[1] 
+    try:
+        name = longresults.split('-', 1)[0] 
+    except IndexError:
+        name = ("Not Found")
+    try:
+        role = longresults.split('-', 1)[1]
+    except IndexError:
+        role = ("Not Found")       
     link = soup.cite.text
     with open(csv_file_path, "a", newline='') as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=csv_headers)
